@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "454393331645",
+    "firebase_url": "https://search-my-city.firebaseio.com",
+    "project_id": "search-my-city",
+    "storage_bucket": "search-my-city.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454393331645:android:eb0ea1f4f01acd48",
+        "android_client_info": {
+          "package_name": "com.mpetroiu.smc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "454393331645-v5aff7oqeu6jtpkcsl6ulriib2ld4bfs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mpetroiu.smc",
+            "certificate_hash": "bf18a871a215d8c66762b198014e644be3f3b1aa"
+          }
+        },
+        {
+          "client_id": "454393331645-vbl6hc2s3jm54dq44gl37llgra53qor0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzbLZqOSDsijN8ibOxZV8fhERorrrqrJM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "454393331645-vbl6hc2s3jm54dq44gl37llgra53qor0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454393331645:android:35bc2704da66d381",
+        "android_client_info": {
+          "package_name": "com.mpetroiu.uniapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "454393331645-v10llk05uufcebajbkigrfqkhuuvuujl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mpetroiu.uniapplication",
+            "certificate_hash": "bf18a871a215d8c66762b198014e644be3f3b1aa"
+          }
+        },
+        {
+          "client_id": "454393331645-pp9apk8pru3up2id1mfr0rsg3esvemh3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mpetroiu.uniapplication",
+            "certificate_hash": "08e10b2ccef6486273be5b35d791d767c02e0d72"
+          }
+        },
+        {
+          "client_id": "454393331645-vbl6hc2s3jm54dq44gl37llgra53qor0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzbLZqOSDsijN8ibOxZV8fhERorrrqrJM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "454393331645-vbl6hc2s3jm54dq44gl37llgra53qor0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
