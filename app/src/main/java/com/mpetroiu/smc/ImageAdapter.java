@@ -23,6 +23,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +32,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -52,7 +55,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     private SharedPref mSharedPref;
     private TextView mExplore;
 
-    public ImageAdapter(List<Upload> uploads) {
+
+    public ImageAdapter(Context context, List<Upload> uploads) {
+        mContext = context;
         mUploads = uploads;
     }
 
@@ -75,6 +80,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public void onBindViewHolder(@NonNull final ImageViewHolder holder, final int position) {
+     uploadCurrent = mUploads.get(position);
         uploadCurrent = mUploads.get(position);
         holder.textViewName.setText(uploadCurrent.getName());
         Picasso.get()
@@ -82,6 +88,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 .fit()
                 .centerCrop()
                 .into(holder.imageView);
+
+        if (mSharedPref.loadFavorite()) {
+            mFavorite.setChecked(true);
+        }
 
         if (mSharedPref.loadFavorite()) {
             mFavorite.setChecked(true);
@@ -98,7 +108,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                     favMap.put("name", name);
                     favMap.put("imageUrl", url);
 
-                    mDataRef.push().setValue(favMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    mDataRef.child(uploadCurrent.getKey()).setValue(favMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
@@ -115,7 +125,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot favSnapshot : dataSnapshot.getChildren()) {
                                 favSnapshot.getRef().removeValue();
+                                Toast.makeText(mContext, "Favorite removed.", Toast.LENGTH_SHORT).show();
                                 mSharedPref.SetFavorite(false);
+
+                                mUploads.clear();
                             }
                         }
 

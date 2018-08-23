@@ -4,6 +4,7 @@ package com.mpetroiu.smc;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -36,15 +37,18 @@ public class PlacesFragment extends Fragment {
     private ImageAdapter mAdapter;
 
     private List<Upload> mUploads;
-
     public PlacesFragment() {
         // Required empty public constructor
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_places, container, false);
+
+
 
         mRecyclerView = view.findViewById(R.id.recycle_view);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
@@ -52,22 +56,54 @@ public class PlacesFragment extends Fragment {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+
         mUploads = new ArrayList<>();
+        return view;
+    }
 
-        DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        DatabaseReference cardRef = mDatabaseRef.child("Places").child("Place").child("placeImages");
+        final DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+
+        final DatabaseReference cardRef = mDatabaseRef.child("Places").child("Place").child("placeImages");
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-                    Upload upload = postSnapshot.getValue(Upload.class);
-                    mUploads.add(upload);
+                       String key =postSnapshot.getKey();
+
+                    mAdapter = new ImageAdapter(getContext(), mUploads);
+                    mRecyclerView.setAdapter(mAdapter);
+
+                    DatabaseReference postCard = cardRef.child(key);
+                       ValueEventListener valueEventListener = new ValueEventListener() {
+                           @Override
+                           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                               mUploads.clear();
+
+                               Upload upload = dataSnapshot.getValue(Upload.class);
+                               upload.setKey(dataSnapshot.getKey());
+
+                               Log.e(TAG, "keyIS: " + upload.getKey());
+                               Log.e(TAG, "ArrayCount" + mUploads.size());
+                               Log.e(TAG, "dataSnap" + dataSnapshot);
+
+                               mUploads.add(upload);
+
+
+                               mAdapter.notifyDataSetChanged();
+
+                           }
+
+                           @Override
+                           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                           }
+                       };
                 }
 
-                mAdapter = new ImageAdapter(mUploads);
-
-                mRecyclerView.setAdapter(mAdapter);
             }
 
             @Override
@@ -75,7 +111,6 @@ public class PlacesFragment extends Fragment {
                 Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        return view;
     }
 
     public static class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {

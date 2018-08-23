@@ -20,12 +20,15 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.support.constraint.Constraints.TAG;
+
 public class ExploreFragment extends Fragment {
 
     private final static String TAG = "ExploreFragment";
     private ListView mList;
 
     private List<Place> mPlaces;
+
 
     public ExploreFragment() {
     }
@@ -37,33 +40,31 @@ public class ExploreFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_explore, container, false);
 
         mList = v.findViewById(R.id.exploreList);
-        DatabaseReference mDataRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://licenta-smc.firebaseio.com/Places/Place");
-        String key = mDataRef.push().getRef().toString();
-        Log.d(TAG,"isthisKey: "+ " " + key);
+
+        mPlaces = new ArrayList<>();
+
+        DatabaseReference mDataRef = FirebaseDatabase.getInstance().getReference().child("Places").child("Place");
+
         mDataRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    Place placeInfo = new Place();
 
-                    placeInfo.setOwner(ds.child("name").getValue(Place.class).getOwner());
-                    placeInfo.setEmail(ds.child("email").getValue(Place.class).getEmail());
-                    placeInfo.setPhone(ds.child("phone").getValue(Place.class).getPhone());
-                    placeInfo.setLocation(ds.child("location").getValue(Place.class).getLocation());
-                    placeInfo.setLocationType(ds.child("type").getValue(Place.class).getLocationType());
-                    placeInfo.setAddress(ds.child("address").getValue(Place.class).getAddress());
+                    Upload upload = ds.getValue(Upload.class);
+                    upload.setKey(ds.getKey());
 
-                    ArrayList<String> array = new ArrayList<>();
-                    array.add(placeInfo.getOwner());
-                    array.add(placeInfo.getEmail());
-                    array.add(placeInfo.getPhone());
-                    array.add(placeInfo.getLocation());
-                    array.add(placeInfo.getLocationType());
-                    array.add(placeInfo.getAddress());
+                    Log.e(TAG, "keyIS: " + upload.getKey());
 
-                    Log.d(TAG,"owner" + placeInfo.getOwner());
 
-                    ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, array);
+                    Place place = ds.getValue(Place.class);
+                    place.setKey(ds.getKey());
+
+                    Log.e(TAG, "keyIS: " + place.getKey());
+
+                    mPlaces.add(place);
+
+
+                    ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, mPlaces);
                     mList.setAdapter(adapter);
                 }
             }

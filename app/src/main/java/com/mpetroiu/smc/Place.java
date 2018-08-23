@@ -7,6 +7,7 @@ public class Place {
     private String mLocation;
     private String mLocationType;
     private String mAddress;
+    private String key;
 
     public Place(){
     }
@@ -66,5 +67,13 @@ public class Place {
 
     public void setAddress(String mAddress) {
         this.mAddress = mAddress;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

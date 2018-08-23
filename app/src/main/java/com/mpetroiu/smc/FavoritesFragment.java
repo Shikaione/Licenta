@@ -1,6 +1,7 @@
 package com.mpetroiu.smc;
 
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -52,6 +53,10 @@ public class FavoritesFragment extends Fragment {
 
         mUploads = new ArrayList<>();
 
+        mAdapter = new ImageAdapter(getContext(),mUploads);
+
+        mRecyclerView.setAdapter(mAdapter);
+
         DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
         DatabaseReference cardRef = mDatabaseRef.child("Favorites");
@@ -60,13 +65,14 @@ public class FavoritesFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+
+                    mUploads.clear();
+
                     Upload upload = postSnapshot.getValue(Upload.class);
                     mUploads.add(upload);
                 }
 
-                mAdapter = new ImageAdapter(mUploads);
-
-                mRecyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
