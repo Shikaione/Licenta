@@ -5,11 +5,11 @@ public class Upload {
     private String mName;
     private String mImageUrl;
 
-    public Upload(){
+    public Upload() {
     }
 
-    public Upload(String mName, String mImageUrl) {
-        if(mName.trim().equals("")){
+    public Upload(String mName, String mImageUrl, String isFav) {
+        if (mName.trim().equals("")) {
             mName = "No Name";
         }
 

@@ -8,19 +8,23 @@ import android.media.Image;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,32 +49,27 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     private ToggleButton mFavorite;
     private Context mContext;
     private Upload uploadCurrent;
-    private Boolean isFavorite;
-    private String url;
+    private SharedPref mSharedPref;
+    private TextView mExplore;
 
-    public ImageAdapter(List<Upload> uploads){
+    public ImageAdapter(List<Upload> uploads) {
         mUploads = uploads;
     }
+
     @NonNull
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
-       View view = LayoutInflater.from(parent.getContext())
-               .inflate(R.layout.card, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.card, parent, false);
 
         ImageViewHolder vH = new ImageViewHolder(view);
         mContext = parent.getContext();
         mFavorite = (ToggleButton) view.findViewById(R.id.toggle_favorite);
         mDataRef = FirebaseDatabase.getInstance().getReference().child("Favorites");
+        mExplore = view.findViewById(R.id.explore);
+        mSharedPref = new SharedPref(mContext);
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-               checkFavorite();
-            }
-        }, 3000);
-
-       return  vH;
+        return vH;
     }
 
 
@@ -83,45 +82,59 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 .fit()
                 .centerCrop()
                 .into(holder.imageView);
+
+        if (mSharedPref.loadFavorite()) {
+            mFavorite.setChecked(true);
+        }
+
         mFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked){
+                if (isChecked) {
                     String name = uploadCurrent.getName();
                     String url = uploadCurrent.getImageUrl();
-                    final Boolean isFav = isChecked;
 
                     Map<String, String> favMap = new HashMap<>();
                     favMap.put("name", name);
-                    favMap.put("url", url);
-                    favMap.put("isFav", isFav.toString());
+                    favMap.put("imageUrl", url);
 
                     mDataRef.push().setValue(favMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
+                            if (task.isSuccessful()) {
+                                mSharedPref.SetFavorite(true);
                                 Toast.makeText(mContext, "Favorite added.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                }else{
-                    url = uploadCurrent.getImageUrl();
-
-                    Query favQuery = mDataRef.orderByChild("url").equalTo(url);
+                } else {
+                    Query favQuery = mDataRef.orderByChild("imageUrl").equalTo(uploadCurrent.getImageUrl());
 
                     favQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot favSnapshot: dataSnapshot.getChildren()) {
+                            for (DataSnapshot favSnapshot : dataSnapshot.getChildren()) {
                                 favSnapshot.getRef().removeValue();
+                                mSharedPref.SetFavorite(false);
                             }
                         }
+
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                             Log.e(TAG, "onCancelled", databaseError.toException());
                         }
                     });
                 }
+            }
+        });
+
+        mExplore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                ExploreFragment exploreFragment = new ExploreFragment();
+                activity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,
+                        exploreFragment).addToBackStack(null).commit();
             }
         });
     }
@@ -131,7 +144,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return mUploads.size();
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder{
+    public class ImageViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textViewName;
         public ImageView imageView;
@@ -143,25 +156,4 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             imageView = itemView.findViewById(R.id.image_view_upload);
         }
     }
-
-    public void checkFavorite(){
-
-        Query favQuery = mDataRef.orderByChild("url").equalTo(url);
-
-        favQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                isFavorite = (Boolean) dataSnapshot.child("isFav").getValue();
-                Log.d("isFavorite: "," " + isFavorite);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        mFavorite.setChecked(isFavorite);
-    }
-
 }
