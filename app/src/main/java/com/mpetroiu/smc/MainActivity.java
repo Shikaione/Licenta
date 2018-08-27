@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().hide();
+
         mBottomNav = findViewById(R.id.navigation);
         mFrame = findViewById(R.id.main_frame);
 
