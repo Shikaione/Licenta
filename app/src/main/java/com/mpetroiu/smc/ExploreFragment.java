@@ -50,7 +50,7 @@ public class ExploreFragment extends Fragment {
                     placeInfo.setEmail(ds.child("email").getValue(Place.class).getEmail());
                     placeInfo.setPhone(ds.child("phone").getValue(Place.class).getPhone());
                     placeInfo.setLocation(ds.child("location").getValue(Place.class).getLocation());
-                    placeInfo.setLocationType(ds.child("type").getValue(Place.class).getLocationType());
+                    placeInfo.setLocType(ds.child("type").getValue(Place.class).getLocType());
                     placeInfo.setAddress(ds.child("address").getValue(Place.class).getAddress());
 
                     ArrayList<String> array = new ArrayList<>();
@@ -58,7 +58,7 @@ public class ExploreFragment extends Fragment {
                     array.add(placeInfo.getEmail());
                     array.add(placeInfo.getPhone());
                     array.add(placeInfo.getLocation());
-                    array.add(placeInfo.getLocationType());
+                    array.add(placeInfo.getLocType());
                     array.add(placeInfo.getAddress());
 
                     Log.d(TAG,"owner" + placeInfo.getOwner());

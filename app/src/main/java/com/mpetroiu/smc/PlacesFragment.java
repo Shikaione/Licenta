@@ -32,19 +32,23 @@ import static android.support.constraint.Constraints.TAG;
 
 public class PlacesFragment extends Fragment {
 
+    private DatabaseReference cardRef;
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
 
     private List<Upload> mUploads;
 
+    private ProgressBar mProgressBar;
+
     public PlacesFragment() {
-        // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_places, container, false);
+
+        mProgressBar = view.findViewById(R.id.circularProgressBar);
 
         mRecyclerView = view.findViewById(R.id.recycle_view);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
@@ -53,28 +57,11 @@ public class PlacesFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mUploads = new ArrayList<>();
+        mAdapter = new ImageAdapter(mUploads);
+        mRecyclerView.setAdapter(mAdapter);
 
-        DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        showAllPlaces();
 
-        DatabaseReference cardRef = mDatabaseRef.child("Places").child("Place").child("placeImages");
-        cardRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-                    Upload upload = postSnapshot.getValue(Upload.class);
-                    mUploads.add(upload);
-                }
-
-                mAdapter = new ImageAdapter(mUploads);
-
-                mRecyclerView.setAdapter(mAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
         return view;
     }
 
@@ -94,5 +81,34 @@ public class PlacesFragment extends Fragment {
     private int dpToPx(int dp) {
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    }
+
+    private void showAllPlaces(){
+        mProgressBar.setVisibility(View.VISIBLE);
+        cardRef = FirebaseDatabase.getInstance().getReference()
+                .child("Places")
+                .child("Place")
+                .child("placeImages");
+
+        cardRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for(DataSnapshot postSnapshot : children){
+                    mUploads.clear();
+
+                    Upload upload = postSnapshot.getValue(Upload.class);
+
+                    mUploads.add(upload);
+                }
+                mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

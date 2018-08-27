@@ -1,6 +1,5 @@
 package com.mpetroiu.smc;
 
-
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,13 +22,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class FavoritesFragment extends Fragment {
 
-
+    private DatabaseReference cardRef;
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
 
@@ -38,10 +33,10 @@ public class FavoritesFragment extends Fragment {
     public FavoritesFragment() {
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
 
         mRecyclerView = view.findViewById(R.id.recycle_view);
@@ -50,23 +45,34 @@ public class FavoritesFragment extends Fragment {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+
+        cardRef = FirebaseDatabase.getInstance().getReference().child("Favorites");
+
         mUploads = new ArrayList<>();
+        mAdapter = new ImageAdapter(mUploads);
+        mRecyclerView.setAdapter(mAdapter);
 
-        DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        showFavorites();
 
-        DatabaseReference cardRef = mDatabaseRef.child("Favorites");
+        return view;
+    }
 
+    private int dpToPx(int dp) {
+        Resources r = getResources();
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    }
+
+    private void showFavorites(){
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for(DataSnapshot postSnapshot : children){
+                    mUploads.clear();
                     Upload upload = postSnapshot.getValue(Upload.class);
                     mUploads.add(upload);
                 }
-
-                mAdapter = new ImageAdapter(mUploads);
-
-                mRecyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -74,11 +80,5 @@ public class FavoritesFragment extends Fragment {
                 Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        return view;
-    }
-
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 }
