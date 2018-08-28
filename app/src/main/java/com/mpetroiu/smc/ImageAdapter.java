@@ -36,6 +36,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card, parent, false);
 
+
         ImageViewHolder vH = new ImageViewHolder(view);
         mContext = parent.getContext();
         mFavorite = (ToggleButton) view.findViewById(R.id.toggle_favorite);
@@ -74,13 +76,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         mExplore = view.findViewById(R.id.explore);
         mSharedPref = new SharedPref(mContext);
 
+
         return vH;
     }
 
 
     @Override
     public void onBindViewHolder(@NonNull final ImageViewHolder holder, final int position) {
-     uploadCurrent = mUploads.get(position);
+        mUploads = new ArrayList<>();
         uploadCurrent = mUploads.get(position);
         holder.textViewName.setText(uploadCurrent.getName());
         Picasso.get()
@@ -150,6 +153,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                         exploreFragment).addToBackStack(null).commit();
             }
         });
+
+
     }
 
     @Override
@@ -159,8 +164,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textViewName;
-        public ImageView imageView;
+        private TextView textViewName;
+        private ImageView imageView;
 
         public ImageViewHolder(@NonNull View itemView) {
             super(itemView);

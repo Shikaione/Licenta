@@ -53,8 +53,6 @@ public class FavoritesFragment extends Fragment {
 
         mUploads = new ArrayList<>();
 
-        mAdapter = new ImageAdapter(getContext(),mUploads);
-
         mRecyclerView.setAdapter(mAdapter);
 
         DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
@@ -64,7 +62,7 @@ public class FavoritesFragment extends Fragment {
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
                     mUploads.clear();
 
@@ -77,7 +75,7 @@ public class FavoritesFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         return view;

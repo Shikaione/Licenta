@@ -37,10 +37,10 @@ public class PlacesFragment extends Fragment {
     private ImageAdapter mAdapter;
 
     private List<Upload> mUploads;
+
     public PlacesFragment() {
         // Required empty public constructor
     }
-
 
 
     @Override
@@ -48,16 +48,16 @@ public class PlacesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_places, container, false);
 
-
-
+        mAdapter = new ImageAdapter(getContext(),mUploads);
         mRecyclerView = view.findViewById(R.id.recycle_view);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
-        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration (2, dpToPx(10), true));
+        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-
+        mRecyclerView.setAdapter(mAdapter);
         mUploads = new ArrayList<>();
+
+        getCardFromDB();
         return view;
     }
 
@@ -65,52 +65,7 @@ public class PlacesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
-        final DatabaseReference cardRef = mDatabaseRef.child("Places").child("Place").child("placeImages");
-        cardRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-                       String key =postSnapshot.getKey();
-
-                    mAdapter = new ImageAdapter(getContext(), mUploads);
-                    mRecyclerView.setAdapter(mAdapter);
-
-                    DatabaseReference postCard = cardRef.child(key);
-                       ValueEventListener valueEventListener = new ValueEventListener() {
-                           @Override
-                           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                               mUploads.clear();
-
-                               Upload upload = dataSnapshot.getValue(Upload.class);
-                               upload.setKey(dataSnapshot.getKey());
-
-                               Log.e(TAG, "keyIS: " + upload.getKey());
-                               Log.e(TAG, "ArrayCount" + mUploads.size());
-                               Log.e(TAG, "dataSnap" + dataSnapshot);
-
-                               mUploads.add(upload);
-
-
-                               mAdapter.notifyDataSetChanged();
-
-                           }
-
-                           @Override
-                           public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                           }
-                       };
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     public static class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
@@ -129,5 +84,36 @@ public class PlacesFragment extends Fragment {
     private int dpToPx(int dp) {
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    }
+
+    public void getCardFromDB(){
+
+        final DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+
+        final DatabaseReference cardRef = mDatabaseRef.child("Places").child("Place").child("placeImages");
+        cardRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                    for (DataSnapshot postSnapshot : children) {
+                        String key = postSnapshot.getKey();
+
+
+
+                        Upload upload = postSnapshot.getValue(Upload.class);
+                        upload.setKey(postSnapshot.getKey());
+
+                        Log.e(TAG, "keyIS: " + upload.getKey());
+                        Log.e(TAG, "dataSnap" + dataSnapshot);
+
+                        mUploads.add(upload);
+                    }
+                    mAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
