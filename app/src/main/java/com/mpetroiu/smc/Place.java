@@ -1,79 +1,72 @@
 package com.mpetroiu.smc;
 
-public class Place {
-    private String mOwner;
-    private String mEmail;
-    private String mPhone;
-    private String mLocation;
-    private String mLocationType;
-    private String mAddress;
-    private String key;
+class Place {
+
+    private String Owner;
+    private String Phone;
+    private String Location;
+    private String LocType;
+    private String Email;
+    private String Address;
 
     public Place(){
+
     }
 
-    public Place(String mOwner, String mEmail, String mPhone, String mLocation, String mLocationType, String mAddress) {
-        this.mOwner = mOwner;
-        this.mEmail = mEmail;
-        this.mPhone = mPhone;
-        this.mLocation = mLocation;
-        this.mLocationType = mLocationType;
-        this.mAddress = mAddress;
+    public Place(String owner, String phone, String location, String locType, String email, String address) {
+        Owner = owner;
+        Phone = phone;
+        Location = location;
+        LocType = locType;
+        Email = email;
+        Address = address;
     }
 
     public String getOwner() {
-        return mOwner;
+        return Owner;
     }
 
-    public void setOwner(String mOwner) {
-        this.mOwner = mOwner;
-    }
-
-    public String getEmail() {
-        return mEmail;
-    }
-
-    public void setEmail(String mEmail) {
-        this.mEmail = mEmail;
+    public void setOwner(String owner) {
+        Owner = owner;
     }
 
     public String getPhone() {
-        return mPhone;
+        return Phone;
     }
 
-    public void setPhone(String mPhone) {
-        this.mPhone = mPhone;
+    public void setPhone(String phone) {
+        Phone = phone;
     }
 
     public String getLocation() {
-        return mLocation;
+        return Location;
     }
 
-    public void setLocation(String mLocation) {
-        this.mLocation = mLocation;
+    public void setLocation(String location) {
+        Location = location;
     }
 
-    public String getLocationType() {
-        return mLocationType;
+    public String getLocType() {
+        return LocType;
     }
 
-    public void setLocationType(String mLocationType) {
-        this.mLocationType = mLocationType;
+    public void setLocType(String locType) {
+        LocType = locType;
+    }
+
+    public String getEmail() {
+        return Email;
+    }
+
+    public void setEmail(String email) {
+        Email = email;
     }
 
     public String getAddress() {
-        return mAddress;
+        return Address;
     }
 
-    public void setAddress(String mAddress) {
-        this.mAddress = mAddress;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+    public void setAddress(String address) {
+        Address = address;
     }
 }

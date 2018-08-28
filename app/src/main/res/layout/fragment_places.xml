@@ -5,6 +5,15 @@
     android:layout_height="wrap_content"
     tools:context=".PlacesFragment">
 
+    <ProgressBar
+        android:id="@+id/circularProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/colorPrimaryLight"
+
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycle_view"

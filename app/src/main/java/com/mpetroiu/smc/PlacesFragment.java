@@ -4,7 +4,6 @@ package com.mpetroiu.smc;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -33,39 +32,37 @@ import static android.support.constraint.Constraints.TAG;
 
 public class PlacesFragment extends Fragment {
 
+    private DatabaseReference cardRef;
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
 
     private List<Upload> mUploads;
 
+    private ProgressBar mProgressBar;
+
     public PlacesFragment() {
-        // Required empty public constructor
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_places, container, false);
 
-        mAdapter = new ImageAdapter(getContext(),mUploads);
+        mProgressBar = view.findViewById(R.id.circularProgressBar);
+
         mRecyclerView = view.findViewById(R.id.recycle_view);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
-        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration (2, dpToPx(10), true));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+
         mUploads = new ArrayList<>();
+        mAdapter = new ImageAdapter(mUploads);
+        mRecyclerView.setAdapter(mAdapter);
 
-        getCardFromDB();
+        showAllPlaces();
+
         return view;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
     }
 
     public static class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
@@ -86,33 +83,31 @@ public class PlacesFragment extends Fragment {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
-    public void getCardFromDB(){
+    private void showAllPlaces(){
+        mProgressBar.setVisibility(View.VISIBLE);
+        cardRef = FirebaseDatabase.getInstance().getReference()
+                .child("Places")
+                .child("Place")
+                .child("placeImages");
 
-        final DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-
-        final DatabaseReference cardRef = mDatabaseRef.child("Places").child("Place").child("placeImages");
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                    for (DataSnapshot postSnapshot : children) {
-                        String key = postSnapshot.getKey();
+                for(DataSnapshot postSnapshot : children){
+                    mUploads.clear();
 
+                    Upload upload = postSnapshot.getValue(Upload.class);
 
-
-                        Upload upload = postSnapshot.getValue(Upload.class);
-                        upload.setKey(postSnapshot.getKey());
-
-                        Log.e(TAG, "keyIS: " + upload.getKey());
-                        Log.e(TAG, "dataSnap" + dataSnapshot);
-
-                        mUploads.add(upload);
-                    }
-                    mAdapter.notifyDataSetChanged();
+                    mUploads.add(upload);
+                }
+                mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.GONE);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
