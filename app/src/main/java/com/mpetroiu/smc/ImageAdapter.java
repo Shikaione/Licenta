@@ -50,7 +50,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     private ToggleButton mFavorite;
     private Upload uploadCurrent;
     private SharedPref mSharedPref;
-
+    
     private TextView mExplore;
 
     public ImageAdapter(List<Upload> uploads) {
