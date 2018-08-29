@@ -50,7 +50,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     private ToggleButton mFavorite;
     private Upload uploadCurrent;
     private SharedPref mSharedPref;
-    
+
     private TextView mExplore;
 
     public ImageAdapter(List<Upload> uploads) {
@@ -78,16 +78,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull final ImageViewHolder holder, final int position) {
         uploadCurrent = mUploads.get(position);
-        holder.textViewName.setText(uploadCurrent.getName());
+        holder.textViewName.setText(uploadCurrent.getLocation());
         Picasso.get()
-                .load(uploadCurrent.getImageUrl())
+                .load(uploadCurrent.getThumbnail())
                 .fit()
                 .centerCrop()
                 .into(holder.imageView);
 
-        if (mSharedPref.loadFavorite()) {
-            mFavorite.setChecked(true);
-        }
+
 
         manageFavorites();
 
@@ -101,6 +99,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             }
         });
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -121,19 +121,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     }
 
     private void manageFavorites(){
+        if (mSharedPref.loadFavorite()) {
+            mFavorite.setChecked(true);
+        }
+
         mFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
 
-                    String name = uploadCurrent.getName();
-                    String url = uploadCurrent.getImageUrl();
+                    String location = uploadCurrent.getLocation();
+                    String thumbnail = uploadCurrent.getThumbnail();
                     String key = uploadCurrent.getKey();
 
+                    Log.e(TAG, "this is key : "+key);
                     Map<String, String> favMap = new HashMap<>();
 
-                    favMap.put("name", name);
-                    favMap.put("imageUrl", url);
+                    favMap.put("location", location);
+                    favMap.put("thumbnail", thumbnail);
 
                     mDataRef.child(key).setValue(favMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -148,13 +153,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                         }
                     });
                 } else {
-                    Query favQuery = mDataRef.orderByChild("imageUrl").equalTo(uploadCurrent.getImageUrl());
+                    Query favQuery = mDataRef.orderByChild("thumbnail").equalTo(uploadCurrent.getThumbnail());
 
-                    favQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    favQuery.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot favSnapshot : dataSnapshot.getChildren()) {
-                                favSnapshot.getRef().removeValue();
+                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                            for (DataSnapshot ds : children) {
+                                ds.getRef().removeValue();
+
                                 mSharedPref.SetFavorite(false);
                             }
                         }

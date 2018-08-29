@@ -84,25 +84,23 @@ public class PlacesFragment extends Fragment {
     }
 
     private void showAllPlaces(){
-        mProgressBar.setVisibility(View.VISIBLE);
         cardRef = FirebaseDatabase.getInstance().getReference()
-                .child("Places")
-                .child("Place")
-                .child("placeImages");
+                .child("Places");
 
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                for(DataSnapshot postSnapshot : children){
-                    mUploads.clear();
-
-                    Upload upload = postSnapshot.getValue(Upload.class);
+                mUploads.clear();
+                for(DataSnapshot ds : children){
+                    Upload upload = ds.getValue(Upload.class);
+                    upload.setKey(ds.getKey());
 
                     mUploads.add(upload);
                 }
                 mAdapter.notifyDataSetChanged();
-                mProgressBar.setVisibility(View.GONE);
+
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
 
             @Override
