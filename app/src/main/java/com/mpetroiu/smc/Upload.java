@@ -2,43 +2,40 @@ package com.mpetroiu.smc;
 
 public class Upload {
 
-    private String mName;
-    private String mImageUrl;
-    private String key;
+    private String Location;
+    private String Thumbnail;
+    private String Key;
 
     public Upload() {
     }
 
-    public Upload(String mName, String mImageUrl, String isFav) {
-        if (mName.trim().equals("")) {
-            mName = "No Name";
-        }
-
-        this.mName = mName;
-        this.mImageUrl = mImageUrl;
+    public Upload(String location, String thumbnail, String key) {
+        Location = location;
+        Thumbnail = thumbnail;
+        Key = key;
     }
 
-    public String getName() {
-        return mName;
+    public String getLocation() {
+        return Location;
     }
 
-    public void setName(String mName) {
-        this.mName = mName;
+    public void setLocation(String location) {
+        Location = location;
     }
 
-    public String getImageUrl() {
-        return mImageUrl;
+    public String getThumbnail() {
+        return Thumbnail;
     }
 
-    public void setImageUrl(String mImageUrl) {
-        this.mImageUrl = mImageUrl;
+    public void setThumbnail(String thumbnail) {
+        Thumbnail = thumbnail;
     }
 
     public String getKey() {
-        return key;
+        return Key;
     }
 
     public void setKey(String key) {
-        this.key = key;
+        Key = key;
     }
 }

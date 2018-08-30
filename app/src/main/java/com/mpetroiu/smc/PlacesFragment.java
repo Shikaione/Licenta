@@ -48,6 +48,9 @@ public class PlacesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_places, container, false);
 
+        cardRef = FirebaseDatabase.getInstance().getReference()
+                .child("Places");
+
         mProgressBar = view.findViewById(R.id.circularProgressBar);
 
         mRecyclerView = view.findViewById(R.id.recycle_view);
@@ -84,25 +87,23 @@ public class PlacesFragment extends Fragment {
     }
 
     private void showAllPlaces(){
-        mProgressBar.setVisibility(View.VISIBLE);
-        cardRef = FirebaseDatabase.getInstance().getReference()
-                .child("Places")
-                .child("Place")
-                .child("placeImages");
 
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                for(DataSnapshot postSnapshot : children){
-                    mUploads.clear();
+                mUploads.clear();
+                for(DataSnapshot ds : children){
+                    ExploreFragment explore = new ExploreFragment();
 
-                    Upload upload = postSnapshot.getValue(Upload.class);
+                    Upload upload = ds.getValue(Upload.class);
+                    upload.setKey(ds.getKey());
 
                     mUploads.add(upload);
                 }
                 mAdapter.notifyDataSetChanged();
-                mProgressBar.setVisibility(View.GONE);
+
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
 
             @Override

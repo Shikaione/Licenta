@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Image;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -78,16 +79,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull final ImageViewHolder holder, final int position) {
         uploadCurrent = mUploads.get(position);
-        holder.textViewName.setText(uploadCurrent.getName());
+        holder.textViewName.setText(uploadCurrent.getLocation());
         Picasso.get()
-                .load(uploadCurrent.getImageUrl())
+                .load(uploadCurrent.getThumbnail())
                 .fit()
                 .centerCrop()
                 .into(holder.imageView);
 
-        if (mSharedPref.loadFavorite()) {
-            mFavorite.setChecked(true);
-        }
+
 
         manageFavorites();
 
@@ -96,11 +95,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 ExploreFragment exploreFragment = new ExploreFragment();
+                Bundle args = new Bundle();
+                args.putString("key", uploadCurrent.getKey());
+                exploreFragment.setArguments(args);
                 activity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,
                         exploreFragment).addToBackStack(null).commit();
+
+                Log.e(TAG, "Key is :" + uploadCurrent.getKey());
             }
         });
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -121,19 +127,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     }
 
     private void manageFavorites(){
+        if (mSharedPref.loadFavorite()) {
+            mFavorite.setChecked(true);
+        }
+
         mFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
 
-                    String name = uploadCurrent.getName();
-                    String url = uploadCurrent.getImageUrl();
+                    String location = uploadCurrent.getLocation();
+                    String thumbnail = uploadCurrent.getThumbnail();
                     String key = uploadCurrent.getKey();
 
+                    Log.e(TAG, "this is key : "+key);
                     Map<String, String> favMap = new HashMap<>();
 
-                    favMap.put("name", name);
-                    favMap.put("imageUrl", url);
+                    favMap.put("location", location);
+                    favMap.put("thumbnail", thumbnail);
 
                     mDataRef.child(key).setValue(favMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -148,13 +159,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                         }
                     });
                 } else {
-                    Query favQuery = mDataRef.orderByChild("imageUrl").equalTo(uploadCurrent.getImageUrl());
+                    Query favQuery = mDataRef.orderByChild("thumbnail").equalTo(uploadCurrent.getThumbnail());
 
-                    favQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    favQuery.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot favSnapshot : dataSnapshot.getChildren()) {
-                                favSnapshot.getRef().removeValue();
+                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                            for (DataSnapshot ds : children) {
+                                ds.getRef().removeValue();
+
                                 mSharedPref.SetFavorite(false);
                             }
                         }

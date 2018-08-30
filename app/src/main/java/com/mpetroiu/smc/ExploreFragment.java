@@ -3,6 +3,7 @@ package com.mpetroiu.smc;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,53 +28,31 @@ public class ExploreFragment extends Fragment {
 
     private List<Place> mPlaces;
 
+    private String key;
+
     public ExploreFragment() {
     }
-
-
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_explore, container, false);
 
-        mList = v.findViewById(R.id.exploreList);
-        DatabaseReference mDataRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://licenta-smc.firebaseio.com/Places/Place");
-        String key = mDataRef.push().getRef().toString();
-        Log.d(TAG,"isthisKey: "+ " " + key);
-        mDataRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    Place placeInfo = new Place();
+        if (getArguments() != null) {
+            key  = getArguments().getString("key");
+            Log.d(TAG, "this is key : " + key);
 
-                    placeInfo.setOwner(ds.child("name").getValue(Place.class).getOwner());
-                    placeInfo.setEmail(ds.child("email").getValue(Place.class).getEmail());
-                    placeInfo.setPhone(ds.child("phone").getValue(Place.class).getPhone());
-                    placeInfo.setLocation(ds.child("location").getValue(Place.class).getLocation());
-                    placeInfo.setLocType(ds.child("type").getValue(Place.class).getLocType());
-                    placeInfo.setAddress(ds.child("address").getValue(Place.class).getAddress());
+        }
 
-                    ArrayList<String> array = new ArrayList<>();
-                    array.add(placeInfo.getOwner());
-                    array.add(placeInfo.getEmail());
-                    array.add(placeInfo.getPhone());
-                    array.add(placeInfo.getLocation());
-                    array.add(placeInfo.getLocType());
-                    array.add(placeInfo.getAddress());
 
-                    Log.d(TAG,"owner" + placeInfo.getOwner());
-
-                    ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, array);
-                    mList.setAdapter(adapter);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
         return v;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
     }
 
     private void showData(DataSnapshot dataSnapshot) {

@@ -3,6 +3,7 @@ package com.mpetroiu.smc;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -52,9 +53,14 @@ public class FavoritesFragment extends Fragment {
         mAdapter = new ImageAdapter(mUploads);
         mRecyclerView.setAdapter(mAdapter);
 
-        showFavorites();
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        showFavorites();
     }
 
     private int dpToPx(int dp) {
@@ -67,8 +73,9 @@ public class FavoritesFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                mUploads.clear();
                 for(DataSnapshot postSnapshot : children){
-                    mUploads.clear();
+
                     Upload upload = postSnapshot.getValue(Upload.class);
                     mUploads.add(upload);
                 }
