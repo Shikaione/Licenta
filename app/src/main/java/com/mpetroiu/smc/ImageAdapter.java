@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Image;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -94,8 +95,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 ExploreFragment exploreFragment = new ExploreFragment();
+                Bundle args = new Bundle();
+                args.putString("key", uploadCurrent.getKey());
+                exploreFragment.setArguments(args);
                 activity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,
                         exploreFragment).addToBackStack(null).commit();
+
+                Log.e(TAG, "Key is :" + uploadCurrent.getKey());
             }
         });
     }

@@ -48,6 +48,9 @@ public class PlacesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_places, container, false);
 
+        cardRef = FirebaseDatabase.getInstance().getReference()
+                .child("Places");
+
         mProgressBar = view.findViewById(R.id.circularProgressBar);
 
         mRecyclerView = view.findViewById(R.id.recycle_view);
@@ -84,8 +87,6 @@ public class PlacesFragment extends Fragment {
     }
 
     private void showAllPlaces(){
-        cardRef = FirebaseDatabase.getInstance().getReference()
-                .child("Places");
 
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -93,6 +94,8 @@ public class PlacesFragment extends Fragment {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                 mUploads.clear();
                 for(DataSnapshot ds : children){
+                    ExploreFragment explore = new ExploreFragment();
+
                     Upload upload = ds.getValue(Upload.class);
                     upload.setKey(ds.getKey());
 
