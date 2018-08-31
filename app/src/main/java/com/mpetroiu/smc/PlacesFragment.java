@@ -94,8 +94,6 @@ public class PlacesFragment extends Fragment {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                 mUploads.clear();
                 for(DataSnapshot ds : children){
-                    ExploreFragment explore = new ExploreFragment();
-
                     Upload upload = ds.getValue(Upload.class);
                     upload.setKey(ds.getKey());
 
