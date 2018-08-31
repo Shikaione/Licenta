@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -96,12 +97,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 ExploreFragment exploreFragment = new ExploreFragment();
                 Bundle args = new Bundle();
-                args.putString("key", uploadCurrent.getKey());
+                args.putString("key", mUploads.get(position).getKey());
                 exploreFragment.setArguments(args);
                 activity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,
                         exploreFragment).addToBackStack(null).commit();
 
                 Log.e(TAG, "Key is :" + uploadCurrent.getKey());
+
             }
         });
     }
