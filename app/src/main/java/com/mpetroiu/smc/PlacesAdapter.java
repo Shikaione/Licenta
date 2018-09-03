@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -72,6 +73,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         mExplore = view.findViewById(R.id.explore);
         mSharedPref = new SharedPref(mContext);
 
+
         return mViewHolder;
     }
 
@@ -85,7 +87,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 .centerCrop()
                 .into(holder.imageView);
 
-
+        if (mSharedPref.loadFavorite()) {
+            mFavorite.setChecked(true);
+        }
 
         manageFavorites();
 
@@ -95,16 +99,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 ExploreFragment exploreFragment = new ExploreFragment();
                 Bundle args = new Bundle();
-                args.putString("key", uploadCurrent.getKey());
+                args.putString("key", mUploads.get(position).getKey());
                 exploreFragment.setArguments(args);
                 activity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,
                         exploreFragment).addToBackStack(null).commit();
 
                 Log.e(TAG, "Key is :" + uploadCurrent.getKey());
+
             }
         });
     }
-
 
 
     @Override
@@ -125,10 +129,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         }
     }
 
-    private void manageFavorites(){
-        if (mSharedPref.loadFavorite()) {
-            mFavorite.setChecked(true);
-        }
+    private void manageFavorites() {
+
 
         mFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -139,7 +141,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                     String thumbnail = uploadCurrent.getThumbnail();
                     String key = uploadCurrent.getKey();
 
-                    Log.e(TAG, "this is key : "+key);
+                    Log.e(TAG, "this is key : " + key);
                     Map<String, String> favMap = new HashMap<>();
 
                     favMap.put("location", location);
