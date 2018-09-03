@@ -13,11 +13,23 @@ public class SharedPref{
     public  void SetFavorite(Boolean state){
         SharedPreferences.Editor editor = mSharedPref.edit();
         editor.putBoolean("Favorite",state);
-        editor.commit();
+        editor.putBoolean("Subscribed",state);
+        editor.apply();
+    }
+
+    public void setSubscribed(Boolean state){
+        SharedPreferences.Editor editor = mSharedPref.edit();
+        editor.putBoolean("Subscribed",state);
+        editor.apply();
     }
 
     public Boolean loadFavorite(){
         Boolean state = mSharedPref.getBoolean("Favorite",false);
+        return state;
+    }
+
+    public boolean loadSubscribed(){
+        Boolean state = mSharedPref.getBoolean("Subscribed", false);
         return state;
     }
 }

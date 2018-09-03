@@ -18,9 +18,26 @@
     <string name="backdrop_subtitle">This season top 20 albums</string>
     <string name="people_rating">People Rating</string>
     <string name="explore">Explore</string>
-    <string name="add_favorite">Add Favorite</string>
+    <string name="add_favorite">Add</string>
+    <string name="remove_favorite">Remove</string>
     <string name="name">Name</string>
+    <!-- Subscribe -->
+    <string name="msg_subscribed">Subscribed</string>
+    <string name="msg_subscribe_failed">Failed to subscribe</string>
+    <string name="msg_unSubscribed">Unsubscribed</string>
+    <string name="msg_unSubscribe_failed">Failed to unsubscribe</string>
     <!--Google MAPS API KEY -->
     <string name="google_maps_api">AIzaSyARjRxmAkybzKsF4THJK-CKL39Uph5PI2w</string>
+    <!--FCM CHANNEL-->
+    <string name="default_notification_channel_id">9005</string>
+    <string name="receive_notification">Receive notifications from this place</string>
+    <string name="search_textView">Search for a place</string>
+    <string name="search_here">Search here ...</string>
+    <string name="place_title">Place title</string>
+    <string name="place_address">Place address</string>
+    <string name="recently_added">Recently added places</string>
+    <string name="nearby_places">Nearby Places</string>
+    <string name="place_type">Place type: </string>
+    <string name="local_name">local name</string>
 
 </resources>

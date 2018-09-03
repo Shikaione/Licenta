@@ -26,8 +26,10 @@ import java.util.List;
 public class FavoritesFragment extends Fragment {
 
     private DatabaseReference cardRef;
+
     private RecyclerView mRecyclerView;
-    private ImageAdapter mAdapter;
+
+    private FavoritesAdapter mAdapter;
 
     private List<Upload> mUploads;
 
@@ -46,11 +48,10 @@ public class FavoritesFragment extends Fragment {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-
         cardRef = FirebaseDatabase.getInstance().getReference().child("Favorites");
 
         mUploads = new ArrayList<>();
-        mAdapter = new ImageAdapter(mUploads);
+        mAdapter = new FavoritesAdapter(mUploads);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -68,13 +69,13 @@ public class FavoritesFragment extends Fragment {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
-    private void showFavorites(){
+    private void showFavorites() {
         cardRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                 mUploads.clear();
-                for(DataSnapshot postSnapshot : children){
+                for (DataSnapshot postSnapshot : children) {
 
                     Upload upload = postSnapshot.getValue(Upload.class);
                     mUploads.add(upload);
@@ -84,7 +85,7 @@ public class FavoritesFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getContext(),databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

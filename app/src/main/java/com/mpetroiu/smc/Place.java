@@ -7,22 +7,31 @@ class Place {
     private String Owner;
     private String Phone;
     private String Location;
-    private String LocType;
+    private String Type;
     private String Email;
     private String Address;
+    private String Thumbnail;
     private String Key;
 
     public Place(){
 
     }
 
-    public Place(String owner, String phone, String location, String locType, String email, String address, String key) {
+    public Place(String owner,
+                 String phone,
+                 String location,
+                 String type,
+                 String email,
+                 String address,
+                 String thumbnail,
+                 String key) {
         Owner = owner;
         Phone = phone;
         Location = location;
-        LocType = locType;
+        Type = type;
         Email = email;
         Address = address;
+        Thumbnail = thumbnail;
         Key = key;
     }
 
@@ -50,12 +59,12 @@ class Place {
         Location = location;
     }
 
-    public String getLocType() {
-        return LocType;
+    public String getType() {
+        return Type;
     }
 
-    public void setLocType(String locType) {
-        LocType = locType;
+    public void setType(String type) {
+        Type = type;
     }
 
     public String getEmail() {
@@ -72,6 +81,14 @@ class Place {
 
     public void setAddress(String address) {
         Address = address;
+    }
+
+    public String getThumbnail() {
+        return Thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        Thumbnail = thumbnail;
     }
 
     @Exclude

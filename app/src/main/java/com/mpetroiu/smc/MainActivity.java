@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
+import com.onesignal.OneSignal;
+
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView mBottomNav;
@@ -23,6 +25,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // OneSignal Initialization
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
 
         getSupportActionBar().hide();
 
@@ -59,9 +68,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
+
     private void setFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction  = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.main_frame, fragment);

@@ -2,31 +2,22 @@ package com.mpetroiu.smc;
 
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,20 +32,19 @@ import java.util.Map;
 
 import static android.support.constraint.Constraints.TAG;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
+public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ImageViewHolder> {
 
     private Context mContext;
 
     private DatabaseReference mDataRef;
 
     private List<Upload> mUploads;
-    private ToggleButton mFavorite;
+
     private Upload uploadCurrent;
-    private SharedPref mSharedPref;
 
-    private TextView mExplore;
+    private TextView mExplore, mFavorite;
 
-    public ImageAdapter(List<Upload> uploads) {
+    public PlacesAdapter(List<Upload> uploads) {
         mUploads = uploads;
     }
 
@@ -62,17 +52,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card, parent, false);
+                .inflate(R.layout.place_card, parent, false);
 
         mContext = parent.getContext();
 
         ImageViewHolder mViewHolder = new ImageViewHolder(view);
 
-        mFavorite = view.findViewById(R.id.toggle_favorite);
+        mFavorite = view.findViewById(R.id.addFavorite);
+
         mDataRef = FirebaseDatabase.getInstance().getReference().child("Favorites");
         mExplore = view.findViewById(R.id.explore);
-        mSharedPref = new SharedPref(mContext);
-
 
         return mViewHolder;
     }
@@ -87,11 +76,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 .centerCrop()
                 .into(holder.imageView);
 
-        if (mSharedPref.loadFavorite()) {
-            mFavorite.setChecked(true);
-        }
-
-        manageFavorites();
+        addFavorite();
 
         mExplore.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,56 +114,52 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         }
     }
 
-    private void manageFavorites() {
+    private void addFavorite() {
 
-
-        mFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if (isChecked) {
+            public void onClick(View v) {
+                String location = uploadCurrent.getLocation();
+                String thumbnail = uploadCurrent.getThumbnail();
+                final String key = uploadCurrent.getKey();
 
-                    String location = uploadCurrent.getLocation();
-                    String thumbnail = uploadCurrent.getThumbnail();
-                    String key = uploadCurrent.getKey();
+                Log.e(TAG, "Key is :" + uploadCurrent.getKey());
 
-                    Log.e(TAG, "this is key : " + key);
-                    Map<String, String> favMap = new HashMap<>();
+                final Map<String, String> favMap = new HashMap<>();
 
-                    favMap.put("location", location);
-                    favMap.put("thumbnail", thumbnail);
+                favMap.put("location", location);
+                favMap.put("thumbnail", thumbnail);
 
-                    mDataRef.child(key).setValue(favMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                mSharedPref.SetFavorite(true);
 
-                                Toast.makeText(mContext,
-                                        "Favorite added.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
+                Query favQuery = mDataRef.orderByChild("thumbnail").equalTo(uploadCurrent.getThumbnail());
+
+                favQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child(key).exists()) {
+                            Toast.makeText(mContext,
+                                    "Already favorite.",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            mDataRef.child(key).setValue(favMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+
+                                        Toast.makeText(mContext,
+                                                "Favorite added.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                         }
-                    });
-                } else {
-                    Query favQuery = mDataRef.orderByChild("thumbnail").equalTo(uploadCurrent.getThumbnail());
+                    }
 
-                    favQuery.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                            for (DataSnapshot ds : children) {
-                                ds.getRef().removeValue();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                mSharedPref.SetFavorite(false);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.e(TAG, "onCancelled", databaseError.toException());
-                        }
-                    });
-                }
+                    }
+                });
             }
         });
     }

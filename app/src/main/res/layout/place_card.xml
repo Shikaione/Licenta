@@ -64,28 +64,31 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:paddingStart="10dp"
+                android:paddingLeft="10dp"
                 android:text="@string/explore" />
 
             <LinearLayout
-                android:id="@+id/addFavorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_gravity="center_vertical"
-                android:layout_marginEnd="10dp">
+                android:layout_marginEnd="10dp"
+                android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="wrap_content"
+                    android:layout_width="15dp"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_favorite"
-                    android:tint="@color/colorPrimaryLight"/>
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_add"
+                    android:tint="@android:color/holo_green_dark" />
+
                 <TextView
+                    android:id="@+id/addFavorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/add_favorite"
                     android:layout_gravity="center"
-                    android:layout_marginStart="5dp"/>
+                    android:layout_marginStart="5dp"
+                    android:text="@string/add_favorite"
+                    android:textSize="12sp" />
             </LinearLayout>
 
 
