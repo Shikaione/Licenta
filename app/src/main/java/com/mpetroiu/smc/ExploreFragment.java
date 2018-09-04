@@ -12,12 +12,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,11 +48,11 @@ public class ExploreFragment extends Fragment {
 
     private String key, Address, Phone, mTopic;
 
-    private TextView mPlaceName, mType;
+    private TextView mPlaceName, mType, mCommentName, mCommentText;
 
     private ImageView mMapLocation, mMapDirections, mPhone;
 
-    private Button mSubscribe, mUnsubscribe;
+    private Button mSubscribe, mUnsubscribe, mWriteComment, mPostComment;
 
     private ArrayList<String> thumbnailList;
 
@@ -121,6 +123,35 @@ public class ExploreFragment extends Fragment {
                 OneSignal.deleteTag("subscribed_topic");
                 Toast.makeText(mContext, "Unsubscribed", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        mWriteComment = v.findViewById(R.id.writeComment);
+        mWriteComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(mContext);
+                View mView = getLayoutInflater().inflate(R.layout.comment_dialog, null);
+
+                mCommentName = (EditText) mView.findViewById(R.id.etUserName);
+                mCommentText = (EditText) mView.findViewById(R.id.etComment);
+                mPostComment = (Button) mView.findViewById(R.id.postComment);
+
+                mPostComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                            Toast.makeText(getContext(),
+                                   "Comment posted.",
+                                    Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                mBuilder.setView(mView);
+                AlertDialog mDialog = mBuilder.create();
+                mDialog.show();
+            }
+
         });
 
         return v;
@@ -216,5 +247,7 @@ public class ExploreFragment extends Fragment {
         }
         return false;
     }
+
+
 }
 

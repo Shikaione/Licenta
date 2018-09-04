@@ -174,7 +174,69 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_comment"
+                    android:tint="@color/colorPrimaryLight"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginEnd="5dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/people_thoughts"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/commentList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+            <Button
+                android:id="@+id/writeComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/search_layout"
+                android:backgroundTint="@color/colorPrimaryLight"
+                android:text="@string/write_your_thoughts"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:layout_marginStart="7dp"
+                android:layout_marginEnd="7dp"
+                android:layout_marginTop="10dp"/>
         </LinearLayout>
 
     </ScrollView>

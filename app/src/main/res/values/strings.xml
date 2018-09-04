@@ -39,5 +39,13 @@
     <string name="nearby_places">Nearby Places</string>
     <string name="place_type">Place type: </string>
     <string name="local_name">local name</string>
+    <string name="people_thoughts">People thoughts</string>
+    <string name="write_your_thoughts">Write your thoughts</string>
+    <string name="user_name">user name</string>
+    <string name="new_comment">New comment</string>
+    <string name="write_your_comment">Write your comment</string>
+    <string name="post_comment">Post comment</string>
+    <string name="comment_txt">Comment ...</string>
+    <string name="displayed_name">Displayed name</string>
 
 </resources>
