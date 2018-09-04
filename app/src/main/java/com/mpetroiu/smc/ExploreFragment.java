@@ -141,9 +141,9 @@ public class ExploreFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
 
-                            Toast.makeText(getContext(),
-                                   "Comment posted.",
-                                    Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(),
+                                "Comment posted.",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
 
