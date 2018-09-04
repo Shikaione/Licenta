@@ -50,28 +50,28 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 switch (item.getItemId()) {
-                    case R.id.nav_home :
+                    case R.id.nav_home:
                         setFragment(mHomeFragment);
-                       return true;
-                    case R.id.nav_places :
+                        return true;
+                    case R.id.nav_places:
                         setFragment(mPlaceFragment);
                         return true;
-                    case R.id.nav_favorites :
+                    case R.id.nav_favorites:
                         setFragment(mFavoriteFragment);
                         return true;
-                    case R.id.nav_search :
+                    case R.id.nav_search:
                         setFragment(mSearchFragment);
                         return true;
 
-                        default:
-                            return false;
+                    default:
+                        return false;
                 }
             }
         });
     }
 
-    private void setFragment(Fragment fragment){
-        FragmentTransaction fragmentTransaction  = getSupportFragmentManager().beginTransaction();
+    private void setFragment(Fragment fragment) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.main_frame, fragment);
         fragmentTransaction.commit();
     }
