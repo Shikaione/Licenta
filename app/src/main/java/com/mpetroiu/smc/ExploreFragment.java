@@ -14,26 +14,40 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
+
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.onesignal.OneSignal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 
 public class ExploreFragment extends Fragment {
@@ -43,6 +57,7 @@ public class ExploreFragment extends Fragment {
     private static final int REQUEST_PHONE_CALL = 1235;
 
     private DatabaseReference mDataRef;
+    private DatabaseReference mComments;
 
     private Context mContext;
 
@@ -54,11 +69,19 @@ public class ExploreFragment extends Fragment {
 
     private Button mSubscribe, mUnsubscribe, mWriteComment, mPostComment;
 
-    private ArrayList<String> thumbnailList;
+    private ArrayList<String> thumbnailList, nameList, commentList;
+
+    private MaterialRatingBar mRatingBar;
 
     private ViewPager viewPager;
     private ViewPagerAdapter adapter;
+    private RecyclerView mCommentRecycle;
+    private CommentAdapter mCommAdapter;
+    private AlertDialog mDialog;
 
+    private FirebaseAuth mAuth;
+
+    private String uid;
 
     public ExploreFragment() {
     }
@@ -70,10 +93,14 @@ public class ExploreFragment extends Fragment {
 
         mContext = v.getContext();
 
+        mAuth = FirebaseAuth.getInstance();
+
         mDataRef = FirebaseDatabase.getInstance().getReference().child("Places");
 
         mPlaceName = v.findViewById(R.id.placeName);
         mType = v.findViewById(R.id.txPlaceType);
+        mRatingBar = (MaterialRatingBar) v.findViewById(R.id.rating);
+
 
         thumbnailList = new ArrayList<>();
 
@@ -86,6 +113,8 @@ public class ExploreFragment extends Fragment {
             Log.d(TAG, "this is key : " + key);
 
         }
+
+        mComments = mDataRef.child(key).child("comments");
 
         showData();
 
@@ -108,6 +137,7 @@ public class ExploreFragment extends Fragment {
 
         mSubscribe = v.findViewById(R.id.subscribe);
         mUnsubscribe = v.findViewById(R.id.unsubscribe);
+
         mSubscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +146,7 @@ public class ExploreFragment extends Fragment {
                 Toast.makeText(mContext, "Subscribed", Toast.LENGTH_SHORT).show();
             }
         });
+
         mUnsubscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,33 +157,32 @@ public class ExploreFragment extends Fragment {
         });
 
         mWriteComment = v.findViewById(R.id.writeComment);
-        mWriteComment.setOnClickListener(new View.OnClickListener() {
+        mCommentRecycle = v.findViewById(R.id.commentList);
+        mCommentRecycle.setHasFixedSize(true);
+        mCommentRecycle.setLayoutManager(new LinearLayoutManager(getContext()));
+        mCommentRecycle.setItemAnimator(new DefaultItemAnimator());
+
+        nameList = new ArrayList<>();
+        commentList = new ArrayList<>();
+
+        showComments();
+
+        mCommAdapter = new CommentAdapter(getContext(), nameList, commentList);
+        mCommentRecycle.setAdapter(mCommAdapter);
+        mCommentRecycle.scrollToPosition(mCommAdapter.getItemCount() - 1);
+
+        loginAnon();
+        mRatingBar.setOnRatingChangeListener(new MaterialRatingBar.OnRatingChangeListener() {
             @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder mBuilder = new AlertDialog.Builder(mContext);
-                View mView = getLayoutInflater().inflate(R.layout.comment_dialog, null);
-
-                mCommentName = (EditText) mView.findViewById(R.id.etUserName);
-                mCommentText = (EditText) mView.findViewById(R.id.etComment);
-                mPostComment = (Button) mView.findViewById(R.id.postComment);
-
-                mPostComment.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        Toast.makeText(getContext(),
-                                "Comment posted.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                mBuilder.setView(mView);
-                AlertDialog mDialog = mBuilder.create();
-                mDialog.show();
+            public void onRatingChanged(MaterialRatingBar ratingBar, float rating) {
+                DatabaseReference ratingRef = mDataRef.child(key).child("rating");
+                ratingRef.child("uid").setValue(uid);
+                ratingRef.child("rating").setValue(rating);
             }
-
         });
+
+        showRating();
+        writeComment();
 
         return v;
     }
@@ -231,6 +261,109 @@ public class ExploreFragment extends Fragment {
         });
     }
 
+    private void showComments() {
+        mComments.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                nameList.clear();
+                commentList.clear();
+
+                int counter = 0;
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String name = ds.getValue(Comment.class).getName();
+                    String comment = ds.getValue(Comment.class).getComment();
+                    String key = ds.getValue(Comment.class).getKey();
+
+                    nameList.add(name);
+                    commentList.add(comment);
+                    counter++;
+
+                    if (counter == 10)
+                        break;
+                }
+                mCommAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void writeComment() {
+        mWriteComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginAnon();
+
+                final AlertDialog.Builder mBuilder = new AlertDialog.Builder(mContext);
+                View mView = getLayoutInflater().inflate(R.layout.comment_dialog, null);
+
+                mCommentName = mView.findViewById(R.id.etUserName);
+                mCommentText = mView.findViewById(R.id.etComment);
+                mPostComment = mView.findViewById(R.id.postComment);
+
+                mBuilder.setView(mView);
+                mDialog = mBuilder.create();
+                mDialog.show();
+
+                mPostComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        HashMap<String, String> comm = new HashMap<>();
+
+                        String name = mCommentName.getText().toString();
+                        String comment = mCommentText.getText().toString();
+
+                        comm.put("name", name);
+                        comm.put("comment", comment);
+                        comm.put("uid", uid);
+                        mComments.push().setValue(comm);
+
+                        mDialog.dismiss();
+
+
+                    }
+                });
+            }
+        });
+    }
+
+    private void loginAnon() {
+        mAuth.signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    uid = mAuth.getCurrentUser().getUid();
+                    Log.d(TAG, "loginAnon: is Successful " + uid);
+                } else {
+                    Log.d(TAG, "loginAnon: failed ");
+                }
+            }
+        });
+
+    }
+
+    private void showRating() {
+        DatabaseReference ratingRef = mDataRef.child(key).child("rating");
+        ratingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Log.d(TAG,"dataSNAP: " + dataSnapshot);
+                    if (dataSnapshot.exists()) {
+                        mRatingBar.setRating(Float.valueOf(dataSnapshot.child("rating").getValue().toString()));
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public boolean isServicesOK() {
         Log.d(TAG, "isServicesOK: checking google services version");
 
@@ -247,7 +380,5 @@ public class ExploreFragment extends Fragment {
         }
         return false;
     }
-
-
 }
 

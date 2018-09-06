@@ -6,14 +6,14 @@
 
     <TextView
         android:id="@+id/commentName"
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:text="@string/user_name" />
 
     <View
         android:id="@+id/btwLines"
         android:layout_width="1dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:background="@color/grey"
