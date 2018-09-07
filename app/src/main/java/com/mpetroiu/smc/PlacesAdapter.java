@@ -74,6 +74,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ImageViewH
                 .load(uploadCurrent.getThumbnail())
                 .fit()
                 .centerCrop()
+                .placeholder(R.drawable.app_logo)
                 .into(holder.imageView);
 
         addFavorite();

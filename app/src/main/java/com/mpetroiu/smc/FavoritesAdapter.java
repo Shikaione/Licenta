@@ -78,6 +78,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Imag
                 .load(uploadCurrent.getThumbnail())
                 .fit()
                 .centerCrop()
+                .placeholder(R.drawable.app_logo)
                 .into(holder.imageView);
 
         removeFavorite();

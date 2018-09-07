@@ -71,7 +71,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         holder.title.setText(locationList.get(position));
         holder.address.setText(addressList.get(position));
 
-        Glide.with(context).load(thumbnailList.get(position)).asBitmap().placeholder(R.mipmap.ic_launcher_round).into(holder.thumb);
+        Glide.with(context).load(thumbnailList.get(position)).asBitmap().placeholder(R.drawable.app_logo).into(holder.thumb);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +85,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
                         exploreFragment).addToBackStack(null).commit();
 
                 Log.e(TAG, "Key is :" + keyList.get(position));
-                Toast.makeText(context, "Full Name Clicked", Toast.LENGTH_SHORT).show();
             }
         });
 

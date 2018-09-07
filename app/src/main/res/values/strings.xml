@@ -1,8 +1,5 @@
 <resources>
-    <string name="app_name">SearchMyCity</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">Search My City</string>
 
     <!-- Navigation Strings -->
     <string name="home">Home</string>
@@ -47,5 +44,6 @@
     <string name="post_comment">Post comment</string>
     <string name="comment_txt">Comment ...</string>
     <string name="displayed_name">Displayed name</string>
+    <string name="title_activity_spalsh">SpalshActivity</string>
 
 </resources>

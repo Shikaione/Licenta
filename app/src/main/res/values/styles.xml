@@ -12,4 +12,13 @@
     <style name="FavoriteRadioButton" parent="@android:style/Widget.CompoundButton.RadioButton">
         <item name="android:button">@drawable/toggle_button</item>
     </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
